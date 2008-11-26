@@ -43,7 +43,7 @@ class MechanicalUncleBob
     end
     
     {:app => stats[:app].inject(0) { |sum, value| sum + value },
-     :tests => stats[:app].inject(0) { |sum, value| sum + value }}
+     :tests => stats[:tests].inject(0) { |sum, value| sum + value }}
   end
   
   def category_for(path)
@@ -63,14 +63,21 @@ class MechanicalUncleBob
      /^config/].any? { |pattern| pattern.match(path) }
   end
   
+  def merge?(sha)
+    Grit::Commit.find_all(repo, sha, :max_count => 1).first.parents.length > 1
+  end
+  
   def run
     stats = commits.inject({}) do |stats, (commit_sha, commit_stats)|
-      stats[commit_sha] = commit_stats.to_diffstat
-      stats
+      if merge?(commit_sha)
+        stats
+      else
+        totals = totals_for(commit_stats.to_diffstat)
+        totals[:app] == 0 && totals[:tests] == 0 ? stats : stats.update(commit_sha => totals)
+      end
     end
     
-    totals = stats.map { |(commit, stat)| totals_for(stat) }
-    pp totals
+    pp stats
   end
   
 end
