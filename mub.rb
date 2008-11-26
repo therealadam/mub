@@ -27,6 +27,21 @@ class MechanicalUncleBob
     @path, @limit = path, limit
   end
   
+  def run
+    stats = commits.inject({}) do |stats, (commit_sha, commit_stats)|
+      totals = totals_for(commit_stats.to_diffstat)
+      if merge?(commit_sha) || no_op?(totals)
+        stats
+      else
+        stats.update(commit_sha => totals)
+      end
+    end
+    
+    pp stats
+  end
+  
+  private
+  
   def repo
     @repo ||= Grit::Repo.new(path)
   end
@@ -67,17 +82,8 @@ class MechanicalUncleBob
     Grit::Commit.find_all(repo, sha, :max_count => 1).first.parents.length > 1
   end
   
-  def run
-    stats = commits.inject({}) do |stats, (commit_sha, commit_stats)|
-      if merge?(commit_sha)
-        stats
-      else
-        totals = totals_for(commit_stats.to_diffstat)
-        totals[:app] == 0 && totals[:tests] == 0 ? stats : stats.update(commit_sha => totals)
-      end
-    end
-    
-    pp stats
+  def no_op?(totals)
+    totals[:app] == 0 && totals[:tests] == 0    
   end
   
 end
