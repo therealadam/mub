@@ -12,27 +12,8 @@
 require 'rubygems'
 require 'pp'
 
+$LOAD_PATH << File.join(Dir.getwd, 'vendor', 'grit', 'lib')
 require 'grit'
-
-# class Grit::CommitStats
-#   def to_diffstat
-#     files.map do |metadata|
-#       DiffStat.new(*metadata)
-#     end
-#   end
-# end
-# 
-# class DiffStat
-#   attr_reader :filename, :additions, :deletions
-#   
-#   def initialize(filename, additions, deletions, total=nil)
-#     @filename, @additions, @deletions = filename, additions, deletions
-#   end
-#   
-#   def inspect
-#     "#{filename}: +#{additions} -#{deletions}"
-#   end
-# end
 
 class MechanicalUncleBob
   
@@ -47,7 +28,6 @@ class MechanicalUncleBob
   end
   
   def repo
-    puts "Loading Git repo from #{path}"
     @repo ||= Grit::Repo.new(path)
   end
   
@@ -57,7 +37,6 @@ class MechanicalUncleBob
   
   def run
     stats = commits.inject({}) do |stats, (commit_sha, commit_stats)|
-      puts commit_sha
       stats[commit_sha] = commit_stats.to_diffstat
       # stats[commit_sha] = commit_stats.to_hash
       stats
