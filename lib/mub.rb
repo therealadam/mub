@@ -14,6 +14,9 @@ require 'pp'
 $LOAD_PATH << File.join(Dir.getwd, 'vendor', 'grit', 'lib')
 require 'grit'
 
+gem 'json'
+require 'json'
+
 class MechanicalUncleBob
   
   def self.run(args)
@@ -36,7 +39,7 @@ class MechanicalUncleBob
       end
     end
     
-    pp stats
+    puts stats.to_json
   end
   
   private
