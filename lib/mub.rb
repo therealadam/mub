@@ -67,6 +67,7 @@ class MechanicalUncleBob
     key = case path
     when /^app/ then :app
     when %r{^public/javascripts} then :app
+    when /^lib/ then :app
     when /^features/ then :tests
     when /^test/ then :tests
     else raise "Unknown category for #{path}"
@@ -77,7 +78,12 @@ class MechanicalUncleBob
     [/^doc/, 
      %r{^public/images}, 
      %r{^public/stylesheets}, 
-     /^config/].any? { |pattern| pattern.match(path) }
+     /^config/,
+     /^Rakefile/,
+     /^Capfile/,
+     /^db/,
+     /^script/,
+     /^vendor/].any? { |pattern| pattern.match(path) }
   end
   
   def merge?(sha)
